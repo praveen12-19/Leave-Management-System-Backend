@@ -1,0 +1,52 @@
+package com.college.leavemanagement.mapper;
+
+import com.college.leavemanagement.dto.mentor.MentorDto;
+import com.college.leavemanagement.entity.Mentor;
+import com.college.leavemanagement.entity.User;
+import javax.annotation.processing.Generated;
+import org.springframework.stereotype.Component;
+
+@Generated(
+    value = "org.mapstruct.ap.MappingProcessor",
+    date = "2026-07-26T15:21:35+0530",
+    comments = "version: 1.6.3, compiler: javac, environment: Java 25.0.1 (Oracle Corporation)"
+)
+@Component
+public class MentorMapperImpl implements MentorMapper {
+
+    @Override
+    public MentorDto toDto(Mentor mentor) {
+        if ( mentor == null ) {
+            return null;
+        }
+
+        MentorDto mentorDto = new MentorDto();
+
+        mentorDto.setUsername( mentorUserUsername( mentor ) );
+        mentorDto.setEmail( mentorUserEmail( mentor ) );
+        mentorDto.setId( mentor.getId() );
+        mentorDto.setName( mentor.getName() );
+        mentorDto.setDeptSection( mentor.getDeptSection() );
+        mentorDto.setAssignedYear( mentor.getAssignedYear() );
+
+        mentorDto.setAssignedStudentCount( mentor.getStudents() != null ? mentor.getStudents().size() : 0 );
+
+        return mentorDto;
+    }
+
+    private String mentorUserUsername(Mentor mentor) {
+        User user = mentor.getUser();
+        if ( user == null ) {
+            return null;
+        }
+        return user.getUsername();
+    }
+
+    private String mentorUserEmail(Mentor mentor) {
+        User user = mentor.getUser();
+        if ( user == null ) {
+            return null;
+        }
+        return user.getEmail();
+    }
+}
