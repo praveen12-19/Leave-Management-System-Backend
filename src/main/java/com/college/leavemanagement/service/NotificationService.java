@@ -30,34 +30,20 @@ public class NotificationService {
 
     @Transactional
     public Notification createNotification(User recipient, String message, Long leaveApplicationId) {
-        Notification notification = Notification.builder()
-                .recipientUser(recipient)
-                .message(message)
-                .leaveApplicationId(leaveApplicationId)
-                .isRead(false)
-                .createdAt(LocalDateTime.now())
-                .build();
-
-        log.info("Created in-app notification for user '{}': {}", recipient.getUsername(), message);
-        return notificationRepository.save(notification);
+        log.info("Notifications disabled - skipping creation for user '{}'", recipient != null ? recipient.getUsername() : "null");
+        return null;
     }
 
     public List<NotificationDto> getUserNotifications(Long recipientUserId) {
-        return notificationRepository.findByRecipientUserIdOrderByCreatedAtDesc(recipientUserId)
-                .stream()
-                .map(notificationMapper::toDto)
-                .collect(Collectors.toList());
+        return java.util.Collections.emptyList();
     }
 
     public long getUnreadCount(Long recipientUserId) {
-        return notificationRepository.countByRecipientUserIdAndIsReadFalse(recipientUserId);
+        return 0L;
     }
 
     @Transactional
     public void markAsRead(Long notificationId) {
-        Notification notification = notificationRepository.findById(notificationId)
-                .orElseThrow(() -> new ResourceNotFoundException("Notification not found with ID: " + notificationId));
-        notification.setRead(true);
-        notificationRepository.save(notification);
+        // No-op
     }
 }

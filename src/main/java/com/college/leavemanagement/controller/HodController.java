@@ -2,6 +2,7 @@ package com.college.leavemanagement.controller;
 
 import com.college.leavemanagement.dto.leave.LeaveApplicationDto;
 import com.college.leavemanagement.dto.leave.LeaveReviewRequest;
+import com.college.leavemanagement.dto.mentor.MentorCreateDto;
 import com.college.leavemanagement.dto.mentor.MentorDto;
 import com.college.leavemanagement.dto.mentor.MentorUpdateDto;
 import com.college.leavemanagement.dto.student.StudentProfileDto;
@@ -15,6 +16,7 @@ import com.college.leavemanagement.service.MentorService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -67,6 +69,12 @@ public class HodController {
     @Operation(summary = "List mentors in HOD's managed department sections")
     public ResponseEntity<List<MentorDto>> getMentors(@AuthenticationPrincipal UserPrincipal user) {
         return ResponseEntity.ok(hodService.getMentorsForHod(user.getLinkedProfileId()));
+    }
+
+    @PostMapping("/mentors")
+    @Operation(summary = "Create a new mentor and assign to department section/year")
+    public ResponseEntity<MentorDto> createMentor(@Valid @RequestBody MentorCreateDto dto) {
+        return new ResponseEntity<>(hodService.createMentor(dto), HttpStatus.CREATED);
     }
 
     @PutMapping("/mentors/{id}")

@@ -17,9 +17,15 @@ public class LeaveApplicationDto {
     private StudentType studentType;
     private HostelBlockName hostelBlock;
     private String roomNumber;
+    private String fatherContact;
+    private String motherContact;
 
     private LocalDate fromDate;
     private LocalDate toDate;
+    private LocalDate returnDate;
+    private String fromTime;
+    private String toTime;
+    private String addressDuringLeave;
     private String reason;
     private LocalDateTime submittedAt;
 
@@ -70,11 +76,29 @@ public class LeaveApplicationDto {
     public String getRoomNumber() { return roomNumber; }
     public void setRoomNumber(String roomNumber) { this.roomNumber = roomNumber; }
 
+    public String getFatherContact() { return fatherContact; }
+    public void setFatherContact(String fatherContact) { this.fatherContact = fatherContact; }
+
+    public String getMotherContact() { return motherContact; }
+    public void setMotherContact(String motherContact) { this.motherContact = motherContact; }
+
     public LocalDate getFromDate() { return fromDate; }
     public void setFromDate(LocalDate fromDate) { this.fromDate = fromDate; }
 
     public LocalDate getToDate() { return toDate; }
     public void setToDate(LocalDate toDate) { this.toDate = toDate; }
+
+    public LocalDate getReturnDate() { return returnDate; }
+    public void setReturnDate(LocalDate returnDate) { this.returnDate = returnDate; }
+
+    public String getFromTime() { return fromTime; }
+    public void setFromTime(String fromTime) { this.fromTime = fromTime; }
+
+    public String getToTime() { return toTime; }
+    public void setToTime(String toTime) { this.toTime = toTime; }
+
+    public String getAddressDuringLeave() { return addressDuringLeave; }
+    public void setAddressDuringLeave(String addressDuringLeave) { this.addressDuringLeave = addressDuringLeave; }
 
     public String getReason() { return reason; }
     public void setReason(String reason) { this.reason = reason; }

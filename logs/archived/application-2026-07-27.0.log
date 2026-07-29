@@ -1,0 +1,60 @@
+2026-07-27 22:56:53.178 [background-preinit] INFO  o.h.validator.internal.util.Version - HV000001: Hibernate Validator 8.0.2.Final
+2026-07-27 22:56:53.313 [main] INFO  c.c.l.LeaveManagementApplication - Starting LeaveManagementApplication using Java 25.0.1 with PID 2276 (C:\Users\ppk76\OneDrive\Desktop\Leave application\Backend\target\classes started by ppk76 in C:\Users\ppk76\OneDrive\Desktop\Leave application\Backend)
+2026-07-27 22:56:53.322 [main] DEBUG c.c.l.LeaveManagementApplication - Running with Spring Boot v3.4.3, Spring v6.2.3
+2026-07-27 22:56:53.324 [main] INFO  c.c.l.LeaveManagementApplication - The following 1 profile is active: "mysql"
+2026-07-27 22:56:55.807 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-07-27 22:56:55.983 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 156 ms. Found 9 JPA repository interfaces.
+2026-07-27 22:56:57.288 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 8080 (http)
+2026-07-27 22:56:57.324 [main] INFO  o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8080"]
+2026-07-27 22:56:57.335 [main] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2026-07-27 22:56:57.342 [main] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.36]
+2026-07-27 22:56:57.547 [main] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2026-07-27 22:56:57.557 [main] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 4041 ms
+2026-07-27 22:56:57.902 [main] INFO  o.h.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-07-27 22:56:58.117 [main] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 6.6.8.Final
+2026-07-27 22:56:58.200 [main] INFO  o.h.c.i.RegionFactoryInitiator - HHH000026: Second-level cache disabled
+2026-07-27 22:56:58.728 [main] INFO  o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-07-27 22:56:58.800 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2026-07-27 22:56:59.207 [main] INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@32a4ea4e
+2026-07-27 22:56:59.211 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2026-07-27 22:56:59.326 [main] WARN  org.hibernate.orm.deprecation - HHH90000025: MySQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-07-27 22:56:59.367 [main] INFO  o.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 8.0.44
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-07-27 22:57:02.240 [main] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-07-27 22:57:02.550 [main] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-07-27 22:57:03.065 [main] INFO  o.s.d.j.r.query.QueryEnhancerFactory - Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-07-27 22:57:03.225 [main] DEBUG c.c.l.security.JwtAuthFilter - Filter 'jwtAuthFilter' configured for use
+2026-07-27 22:57:05.650 [main] INFO  o.s.s.c.a.a.c.InitializeUserDetailsBeanManagerConfigurer$InitializeUserDetailsManagerConfigurer - Global AuthenticationManager configured with UserDetailsService bean with name customUserDetailsService
+2026-07-27 22:57:05.945 [main] WARN  o.s.b.a.o.j.JpaBaseConfiguration$JpaWebConfiguration - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-07-27 22:57:07.513 [main] INFO  o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8080"]
+2026-07-27 22:57:07.584 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 8080 (http) with context path '/'
+2026-07-27 22:57:07.634 [main] INFO  c.c.l.LeaveManagementApplication - Started LeaveManagementApplication in 17.04 seconds (process running for 18.629)
+2026-07-27 22:57:07.700 [main] INFO  c.c.l.config.AdminInitializer - Purged stale notifications from database.
+2026-07-27 22:57:07.883 [main] INFO  c.c.l.config.AdminInitializer - Updated FKt8ievafor22iuvg5sd4p7lhbk with ON DELETE CASCADE in MySQL.
+2026-07-27 22:57:08.369 [main] INFO  c.c.l.config.AdminInitializer - UPDATED DEFAULT ADMIN ACCOUNT -> Username: 'admin' | Password: 'admin123'
+2026-07-27 22:58:01.599 [http-nio-8080-exec-1] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-07-27 22:58:01.615 [http-nio-8080-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2026-07-27 22:58:01.666 [http-nio-8080-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Completed initialization in 31 ms
+2026-07-27 22:58:07.660 [http-nio-8080-exec-2] INFO  c.c.l.service.AuthService - Attempting login for user: admin@gmail.com
+2026-07-27 22:58:10.756 [http-nio-8080-exec-2] INFO  c.c.l.service.AuditLogService - AUDIT LOG: [LOGIN_SUCCESS] by user 'admin' (ADMIN) on User #1 - User successfully logged in with role: ADMIN
+2026-07-27 22:58:22.791 [http-nio-8080-exec-2] INFO  c.c.l.service.AuditLogService - AUDIT LOG: [DELETE_MENTOR] by user 'admin' (ADMIN) on Mentor #8 - Deleted mentor ID: 8
+2026-07-27 22:59:15.927 [http-nio-8080-exec-6] INFO  c.c.l.service.AuditLogService - AUDIT LOG: [CREATE_HOD] by user 'admin' (ADMIN) on Hod #5 - Created HOD: Sivakani
+2026-07-27 23:00:29.037 [http-nio-8080-exec-2] INFO  c.c.l.service.AuthService - Attempting login for user: hodcsbsaids@gmail.com
+2026-07-27 23:00:29.942 [http-nio-8080-exec-2] INFO  c.c.l.service.AuditLogService - AUDIT LOG: [LOGIN_SUCCESS] by user 'sivakani' (HOD) on User #259 - User successfully logged in with role: HOD
+2026-07-27 23:27:58.850 [http-nio-8080-exec-2] INFO  c.c.l.service.AuthService - Attempting login for user: admin@gmail.com
+2026-07-27 23:27:59.346 [http-nio-8080-exec-2] INFO  c.c.l.service.AuditLogService - AUDIT LOG: [LOGIN_SUCCESS] by user 'admin' (ADMIN) on User #1 - User successfully logged in with role: ADMIN
+2026-07-27 23:28:17.912 [http-nio-8080-exec-5] INFO  c.c.l.service.AuditLogService - AUDIT LOG: [UPDATE_HOD] by user 'admin' (ADMIN) on Hod #5 - Updated HOD details
+2026-07-27 23:28:27.511 [http-nio-8080-exec-5] INFO  c.c.l.service.AuthService - Attempting login for user: hodcsbsaids@gmail.com
+2026-07-27 23:28:27.860 [http-nio-8080-exec-5] INFO  c.c.l.service.AuditLogService - AUDIT LOG: [LOGIN_SUCCESS] by user 'sivakani' (HOD) on User #259 - User successfully logged in with role: HOD
+2026-07-27 23:28:52.166 [http-nio-8080-exec-2] INFO  c.c.l.service.AuthService - Attempting login for user: hodcsbsaids@gmail.com
+2026-07-27 23:28:52.683 [http-nio-8080-exec-2] INFO  c.c.l.service.AuditLogService - AUDIT LOG: [LOGIN_SUCCESS] by user 'sivakani' (HOD) on User #259 - User successfully logged in with role: HOD
+2026-07-27 23:31:35.151 [http-nio-8080-exec-2] INFO  c.c.l.service.AuthService - Attempting login for user: admin@gmail.com
+2026-07-27 23:31:35.475 [http-nio-8080-exec-2] INFO  c.c.l.service.AuditLogService - AUDIT LOG: [LOGIN_SUCCESS] by user 'admin' (ADMIN) on User #1 - User successfully logged in with role: ADMIN
+2026-07-27 23:33:39.719 [http-nio-8080-exec-6] INFO  c.c.l.service.AuditLogService - AUDIT LOG: [CREATE_MENTOR] by user 'admin' (ADMIN) on Mentor #9 - Created mentor: Gatheesh
+2026-07-27 23:38:05.327 [http-nio-8080-exec-2] INFO  c.c.l.service.AuditLogService - AUDIT LOG: [UPDATE_MENTOR] by user 'admin' (ADMIN) on Mentor #9 - Updated mentor details

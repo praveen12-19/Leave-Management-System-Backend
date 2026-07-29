@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2026-07-26T15:21:35+0530",
+    date = "2026-07-29T19:33:52+0530",
     comments = "version: 1.6.3, compiler: javac, environment: Java 25.0.1 (Oracle Corporation)"
 )
 @Component
@@ -30,6 +30,9 @@ public class MentorMapperImpl implements MentorMapper {
         mentorDto.setAssignedYear( mentor.getAssignedYear() );
 
         mentorDto.setAssignedStudentCount( mentor.getStudents() != null ? mentor.getStudents().size() : 0 );
+        mentorDto.setHostellerCount( mentor.getStudents() != null ? (int) mentor.getStudents().stream().filter(s -> s.getStudentType() == com.college.leavemanagement.enums.StudentType.HOSTELLER).count() : 0 );
+        mentorDto.setDayScholarCount( mentor.getStudents() != null ? (int) mentor.getStudents().stream().filter(s -> s.getStudentType() == com.college.leavemanagement.enums.StudentType.DAY_SCHOLAR).count() : 0 );
+        mentorDto.setBlackTagCount( mentor.getStudents() != null ? (int) mentor.getStudents().stream().filter(s -> s.getStudentType() == com.college.leavemanagement.enums.StudentType.BLACK_TAG).count() : 0 );
 
         return mentorDto;
     }

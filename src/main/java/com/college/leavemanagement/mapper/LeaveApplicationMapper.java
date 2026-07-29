@@ -20,6 +20,8 @@ public interface LeaveApplicationMapper {
     @Mapping(source = "student.studentType", target = "studentType")
     @Mapping(source = "student.hostelBlock", target = "hostelBlock")
     @Mapping(source = "student.roomNumber", target = "roomNumber")
+    @Mapping(source = "student.fatherContact", target = "fatherContact")
+    @Mapping(source = "student.motherContact", target = "motherContact")
     @Mapping(target = "history", ignore = true)
     LeaveApplicationDto toDto(LeaveApplication leaveApplication);
 

@@ -20,6 +20,7 @@ public class StudentProfileDto {
     private String roomNumber;
     private Long mentorId;
     private String mentorName;
+    private String hodName;
     private long totalLeavesSubmitted;
     private long totalLeavesApproved;
 
@@ -66,6 +67,9 @@ public class StudentProfileDto {
 
     public String getMentorName() { return mentorName; }
     public void setMentorName(String mentorName) { this.mentorName = mentorName; }
+
+    public String getHodName() { return hodName; }
+    public void setHodName(String hodName) { this.hodName = hodName; }
 
     public long getTotalLeavesSubmitted() { return totalLeavesSubmitted; }
     public void setTotalLeavesSubmitted(long totalLeavesSubmitted) { this.totalLeavesSubmitted = totalLeavesSubmitted; }

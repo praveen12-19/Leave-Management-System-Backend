@@ -67,8 +67,16 @@ public class LeaveApplicationService {
         Student student = studentRepository.findById(studentId)
                 .orElseThrow(() -> new ResourceNotFoundException("Student profile not found for ID: " + studentId));
 
+        if (student.getMentor() == null && student.getDeptSection() != null && student.getYear() != null) {
+            List<Mentor> classMentors = mentorRepository.findByDeptSectionAndAssignedYear(student.getDeptSection(), student.getYear());
+            if (!classMentors.isEmpty()) {
+                student.setMentor(classMentors.get(0));
+                studentRepository.save(student);
+            }
+        }
+
         if (student.getMentor() == null) {
-            throw new BusinessException("Cannot submit leave request. No mentor is currently assigned to you.");
+            throw new BusinessException("Cannot submit leave request. No mentor is currently assigned to your department section / year.");
         }
 
         LocalDateTime now = LocalDateTime.now();
@@ -86,6 +94,11 @@ public class LeaveApplicationService {
                 .wardenStatus(wardenInitialStatus)
                 .finalStatus(ApprovalStatus.PENDING)
                 .build();
+
+        leave.setReturnDate(request.getReturnDate() != null ? request.getReturnDate() : request.getToDate());
+        leave.setFromTime(request.getFromTime());
+        leave.setToTime(request.getToTime());
+        leave.setAddressDuringLeave(request.getAddressDuringLeave());
 
         LeaveApplication savedLeave = leaveApplicationRepository.save(leave);
 
@@ -125,16 +138,35 @@ public class LeaveApplicationService {
     }
 
     // --- MENTOR ACTIONS ---
+    @Transactional
     public List<LeaveApplicationDto> getMentorPendingRequests(Long mentorId) {
-        return leaveApplicationRepository.findByStudentMentorIdAndCurrentStageOrderBySubmittedAtAsc(mentorId, LeaveStage.MENTOR_REVIEW)
-                .stream()
+        Mentor mentor = mentorRepository.findById(mentorId).orElse(null);
+        List<LeaveApplication> requests;
+        if (mentor != null && mentor.getDeptSection() != null && mentor.getAssignedYear() != null) {
+            requests = leaveApplicationRepository.findPendingForMentor(mentorId, mentor.getDeptSection(), mentor.getAssignedYear());
+            for (LeaveApplication leave : requests) {
+                if (leave.getStudent().getMentor() == null || !leave.getStudent().getMentor().getId().equals(mentorId)) {
+                    leave.getStudent().setMentor(mentor);
+                    studentRepository.save(leave.getStudent());
+                }
+            }
+        } else {
+            requests = leaveApplicationRepository.findByStudentMentorIdAndCurrentStageOrderBySubmittedAtAsc(mentorId, LeaveStage.MENTOR_REVIEW);
+        }
+        return requests.stream()
                 .map(this::enrichWithHistory)
                 .toList();
     }
 
     public List<LeaveApplicationDto> getMentorLeaveHistory(Long mentorId) {
-        return leaveApplicationRepository.findByStudentMentorIdAndMentorStatusNotOrderByMentorActedAtDesc(mentorId, ApprovalStatus.PENDING)
-                .stream()
+        Mentor mentor = mentorRepository.findById(mentorId).orElse(null);
+        List<LeaveApplication> history;
+        if (mentor != null && mentor.getDeptSection() != null && mentor.getAssignedYear() != null) {
+            history = leaveApplicationRepository.findHistoryForMentor(mentorId, mentor.getDeptSection(), mentor.getAssignedYear());
+        } else {
+            history = leaveApplicationRepository.findByStudentMentorIdAndMentorStatusNotOrderByMentorActedAtDesc(mentorId, ApprovalStatus.PENDING);
+        }
+        return history.stream()
                 .map(this::enrichWithHistory)
                 .toList();
     }
@@ -147,8 +179,18 @@ public class LeaveApplicationService {
         Mentor mentor = mentorRepository.findById(mentorId)
                 .orElseThrow(() -> new ResourceNotFoundException("Mentor profile not found with ID: " + mentorId));
 
-        if (!leave.getStudent().getMentor().getId().equals(mentorId)) {
+        boolean isAssignedMentor = leave.getStudent().getMentor() != null && leave.getStudent().getMentor().getId().equals(mentorId);
+        boolean isClassMentor = mentor.getDeptSection() != null && mentor.getAssignedYear() != null
+                && mentor.getDeptSection().equals(leave.getStudent().getDeptSection())
+                && mentor.getAssignedYear().equals(leave.getStudent().getYear());
+
+        if (!isAssignedMentor && !isClassMentor) {
             throw new UnauthorizedException("You are not authorized to review leave for this student.");
+        }
+
+        if (leave.getStudent().getMentor() == null || !leave.getStudent().getMentor().getId().equals(mentorId)) {
+            leave.getStudent().setMentor(mentor);
+            studentRepository.save(leave.getStudent());
         }
 
         if (leave.getCurrentStage() != LeaveStage.MENTOR_REVIEW) {
@@ -189,9 +231,16 @@ public class LeaveApplicationService {
         Set<HodDepartmentAssignment> assignments = hod.getManagedDepartmentAssignments();
         List<LeaveApplication> result = new ArrayList<>();
         for (HodDepartmentAssignment assignment : assignments) {
-            result.addAll(leaveApplicationRepository.findPendingForHod(assignment.getDeptSection(), assignment.getYear()));
+            if (assignment.getDeptSection() == null) continue;
+            if (assignment.getYear() != null) {
+                result.addAll(leaveApplicationRepository.findPendingForHod(assignment.getDeptSection(), assignment.getYear()));
+            } else {
+                for (com.college.leavemanagement.enums.Year y : com.college.leavemanagement.enums.Year.values()) {
+                    result.addAll(leaveApplicationRepository.findPendingForHod(assignment.getDeptSection(), y));
+                }
+            }
         }
-        return result.stream().map(this::enrichWithHistory).toList();
+        return result.stream().distinct().map(this::enrichWithHistory).toList();
     }
 
     public List<LeaveApplicationDto> getHodLeaveHistory(Long hodId) {
@@ -201,9 +250,16 @@ public class LeaveApplicationService {
         Set<HodDepartmentAssignment> assignments = hod.getManagedDepartmentAssignments();
         List<LeaveApplication> result = new ArrayList<>();
         for (HodDepartmentAssignment assignment : assignments) {
-            result.addAll(leaveApplicationRepository.findHistoryForHod(assignment.getDeptSection(), assignment.getYear()));
+            if (assignment.getDeptSection() == null) continue;
+            if (assignment.getYear() != null) {
+                result.addAll(leaveApplicationRepository.findHistoryForHod(assignment.getDeptSection(), assignment.getYear()));
+            } else {
+                for (com.college.leavemanagement.enums.Year y : com.college.leavemanagement.enums.Year.values()) {
+                    result.addAll(leaveApplicationRepository.findHistoryForHod(assignment.getDeptSection(), y));
+                }
+            }
         }
-        return result.stream().map(this::enrichWithHistory).toList();
+        return result.stream().distinct().map(this::enrichWithHistory).toList();
     }
 
     @Transactional

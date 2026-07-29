@@ -41,6 +41,8 @@ public class AdminService {
     private final MentorRepository mentorRepository;
     private final HodRepository hodRepository;
     private final WardenRepository wardenRepository;
+    private final LeaveApplicationRepository leaveApplicationRepository;
+    private final NotificationRepository notificationRepository;
     private final PasswordEncoder passwordEncoder;
     private final StudentMapper studentMapper;
     private final MentorMapper mentorMapper;
@@ -50,7 +52,8 @@ public class AdminService {
 
     public AdminService(UserRepository userRepository, StudentRepository studentRepository,
                         MentorRepository mentorRepository, HodRepository hodRepository,
-                        WardenRepository wardenRepository, PasswordEncoder passwordEncoder,
+                        WardenRepository wardenRepository, LeaveApplicationRepository leaveApplicationRepository,
+                        NotificationRepository notificationRepository, PasswordEncoder passwordEncoder,
                         StudentMapper studentMapper, MentorMapper mentorMapper,
                         HodMapper hodMapper, WardenMapper wardenMapper,
                         AuditLogService auditLogService) {
@@ -59,6 +62,8 @@ public class AdminService {
         this.mentorRepository = mentorRepository;
         this.hodRepository = hodRepository;
         this.wardenRepository = wardenRepository;
+        this.leaveApplicationRepository = leaveApplicationRepository;
+        this.notificationRepository = notificationRepository;
         this.passwordEncoder = passwordEncoder;
         this.studentMapper = studentMapper;
         this.mentorMapper = mentorMapper;
@@ -122,7 +127,29 @@ public class AdminService {
     }
 
     public List<StudentProfileDto> getAllStudents() {
-        return studentRepository.findAll().stream().map(studentMapper::toDto).collect(Collectors.toList());
+        return studentRepository.findAll().stream()
+                .map(s -> {
+                    if (s.getMentor() != null) {
+                        if (s.getMentor().getDeptSection() != s.getDeptSection() || s.getMentor().getAssignedYear() != s.getYear()) {
+                            s.setMentor(null);
+                            studentRepository.save(s);
+                        }
+                    }
+                    StudentProfileDto dto = studentMapper.toDto(s);
+                    List<Mentor> classMentors = mentorRepository.findByDeptSectionAndAssignedYear(s.getDeptSection(), s.getYear());
+                    if (classMentors != null && !classMentors.isEmpty()) {
+                        String names = classMentors.stream().map(Mentor::getName).distinct().collect(Collectors.joining(", "));
+                        dto.setMentorName(names);
+                        if (classMentors.get(0) != null) dto.setMentorId(classMentors.get(0).getId());
+                    } else if (s.getMentor() != null && s.getMentor().getDeptSection() == s.getDeptSection() && s.getMentor().getAssignedYear() == s.getYear()) {
+                        dto.setMentorName(s.getMentor().getName());
+                    } else {
+                        dto.setMentorName("Unassigned");
+                        dto.setMentorId(null);
+                    }
+                    return dto;
+                })
+                .collect(Collectors.toList());
     }
 
     @Transactional
@@ -168,7 +195,29 @@ public class AdminService {
     public void deleteStudent(Long id) {
         Student student = studentRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Student not found with ID: " + id));
+
+        // 1. Delete leave applications submitted by student
+        List<LeaveApplication> leaves = leaveApplicationRepository.findByStudentIdOrderBySubmittedAtDesc(id);
+        if (!leaves.isEmpty()) {
+            leaveApplicationRepository.deleteAll(leaves);
+            leaveApplicationRepository.flush();
+        }
+
+        // 2. Unlink mentor and user reference
+        student.setMentor(null);
+        User user = student.getUser();
+        student.setUser(null);
+        studentRepository.saveAndFlush(student);
+
+        // 3. Native SQL delete notifications & user account
+        if (user != null) {
+            notificationRepository.deleteNotificationsByUserIdNative(user.getId());
+            userRepository.deleteUserNative(user.getId());
+        }
+
+        // 4. Delete student entity
         studentRepository.delete(student);
+        studentRepository.flush();
         auditLogService.logAction("DELETE_STUDENT", "Student", id, "Deleted student ID: " + id);
     }
 
@@ -199,6 +248,15 @@ public class AdminService {
         user.setLinkedProfileId(saved.getId());
         userRepository.save(user);
 
+        if (saved.getDeptSection() != null && saved.getAssignedYear() != null) {
+            List<Student> classStudents = studentRepository.findByDeptSectionAndYearOrderByRegNoAsc(
+                    saved.getDeptSection(), saved.getAssignedYear());
+            for (Student s : classStudents) {
+                s.setMentor(saved);
+                studentRepository.save(s);
+            }
+        }
+
         auditLogService.logAction("CREATE_MENTOR", "Mentor", saved.getId(), "Created mentor: " + saved.getName());
         return mentorMapper.toDto(saved);
     }
@@ -222,6 +280,25 @@ public class AdminService {
         if (dto.getAssignedYear() != null) mentor.setAssignedYear(dto.getAssignedYear());
 
         Mentor updated = mentorRepository.saveAndFlush(mentor);
+
+        // 1. Unlink students previously assigned to this mentor if they do not belong to the new class
+        List<Student> previousStudents = studentRepository.findByMentorIdOrderByRegNoAsc(updated.getId());
+        for (Student ps : previousStudents) {
+            if (ps.getDeptSection() != updated.getDeptSection() || ps.getYear() != updated.getAssignedYear()) {
+                ps.setMentor(null);
+                studentRepository.save(ps);
+            }
+        }
+
+        // 2. Link all students of the new class section & academic year to this mentor
+        if (updated.getDeptSection() != null && updated.getAssignedYear() != null) {
+            List<Student> classStudents = studentRepository.findByDeptSectionAndYearOrderByRegNoAsc(
+                    updated.getDeptSection(), updated.getAssignedYear());
+            for (Student s : classStudents) {
+                s.setMentor(updated);
+                studentRepository.save(s);
+            }
+        }
         auditLogService.logAction("UPDATE_MENTOR", "Mentor", updated.getId(), "Updated mentor details");
         return mentorMapper.toDto(updated);
     }
@@ -230,7 +307,24 @@ public class AdminService {
     public void deleteMentor(Long id) {
         Mentor mentor = mentorRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Mentor not found with ID: " + id));
+
+        Long userId = (mentor.getUser() != null) ? mentor.getUser().getId() : null;
+
+        // 1. Bulk update database table `students` so mentor_id is set to NULL immediately via native SQL
+        studentRepository.unlinkMentorNative(id);
+
+        // 2. Unlink user and execute native SQL delete for notifications & user account
+        mentor.setUser(null);
+        mentorRepository.saveAndFlush(mentor);
+
+        if (userId != null) {
+            notificationRepository.deleteNotificationsByUserIdNative(userId);
+            userRepository.deleteUserNative(userId);
+        }
+
+        // 3. Delete mentor profile & flush SQL queue
         mentorRepository.delete(mentor);
+        mentorRepository.flush();
         auditLogService.logAction("DELETE_MENTOR", "Mentor", id, "Deleted mentor ID: " + id);
     }
 
@@ -290,7 +384,23 @@ public class AdminService {
     public void deleteHod(Long id) {
         Hod hod = hodRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("HOD not found with ID: " + id));
+
+        if (hod.getManagedDepartmentAssignments() != null) {
+            hod.getManagedDepartmentAssignments().clear();
+            hodRepository.saveAndFlush(hod);
+        }
+
+        User user = hod.getUser();
+        hod.setUser(null);
+        hodRepository.saveAndFlush(hod);
+
+        if (user != null) {
+            notificationRepository.deleteNotificationsByUserIdNative(user.getId());
+            userRepository.deleteUserNative(user.getId());
+        }
+
         hodRepository.delete(hod);
+        hodRepository.flush();
         auditLogService.logAction("DELETE_HOD", "Hod", id, "Deleted HOD ID: " + id);
     }
 
@@ -340,7 +450,7 @@ public class AdminService {
             user.setEmail(dto.getEmail());
             userRepository.saveAndFlush(user);
         }
-        
+
         warden.setAssignedBlock(dto.getAssignedBlock());
         if (warden.getUser() != null) {
             Role newRole = (dto.getAssignedBlock() == null) ? Role.CHIEF_WARDEN : Role.WARDEN;
@@ -357,7 +467,18 @@ public class AdminService {
     public void deleteWarden(Long id) {
         Warden warden = wardenRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Warden not found with ID: " + id));
+
+        User user = warden.getUser();
+        warden.setUser(null);
+        wardenRepository.saveAndFlush(warden);
+
+        if (user != null) {
+            notificationRepository.deleteNotificationsByUserIdNative(user.getId());
+            userRepository.deleteUserNative(user.getId());
+        }
+
         wardenRepository.delete(warden);
+        wardenRepository.flush();
         auditLogService.logAction("DELETE_WARDEN", "Warden", id, "Deleted warden ID: " + id);
     }
 

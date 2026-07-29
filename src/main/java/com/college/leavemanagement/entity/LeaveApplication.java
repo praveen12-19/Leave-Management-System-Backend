@@ -25,6 +25,14 @@ public class LeaveApplication {
     @Column(nullable = false)
     private LocalDate toDate;
 
+    private LocalDate returnDate;
+
+    private String fromTime;
+
+    private String toTime;
+
+    private String addressDuringLeave;
+
     @Column(nullable = false, length = 1000)
     private String reason;
 
@@ -97,6 +105,18 @@ public class LeaveApplication {
 
     public LocalDate getToDate() { return toDate; }
     public void setToDate(LocalDate toDate) { this.toDate = toDate; }
+
+    public LocalDate getReturnDate() { return returnDate; }
+    public void setReturnDate(LocalDate returnDate) { this.returnDate = returnDate; }
+
+    public String getFromTime() { return fromTime; }
+    public void setFromTime(String fromTime) { this.fromTime = fromTime; }
+
+    public String getToTime() { return toTime; }
+    public void setToTime(String toTime) { this.toTime = toTime; }
+
+    public String getAddressDuringLeave() { return addressDuringLeave; }
+    public void setAddressDuringLeave(String addressDuringLeave) { this.addressDuringLeave = addressDuringLeave; }
 
     public String getReason() { return reason; }
     public void setReason(String reason) { this.reason = reason; }

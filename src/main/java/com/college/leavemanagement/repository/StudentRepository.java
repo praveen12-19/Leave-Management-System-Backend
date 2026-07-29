@@ -18,5 +18,14 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
     List<Student> findByHostelBlockOrderByRoomNumberAsc(HostelBlockName hostelBlock);
     List<Student> findByRegNoContainingIgnoreCaseOrNameContainingIgnoreCase(String regNo, String name);
     List<Student> findByDeptSectionAndYearOrderByRegNoAsc(DeptSection deptSection, Year year);
+    List<Student> findByDeptSectionOrderByRegNoAsc(DeptSection deptSection);
     boolean existsByRegNo(String regNo);
+
+    @org.springframework.data.jpa.repository.Modifying(clearAutomatically = true, flushAutomatically = true)
+    @org.springframework.data.jpa.repository.Query("UPDATE Student s SET s.mentor = null WHERE s.mentor.id = :mentorId")
+    int unlinkMentorFromStudents(@org.springframework.data.repository.query.Param("mentorId") Long mentorId);
+
+    @org.springframework.data.jpa.repository.Modifying(clearAutomatically = true, flushAutomatically = true)
+    @org.springframework.data.jpa.repository.Query(value = "UPDATE students SET mentor_id = NULL WHERE mentor_id = :mentorId", nativeQuery = true)
+    int unlinkMentorNative(@org.springframework.data.repository.query.Param("mentorId") Long mentorId);
 }

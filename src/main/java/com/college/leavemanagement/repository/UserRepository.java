@@ -13,5 +13,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByUsernameOrEmail(String username, String email);
     boolean existsByUsername(String username);
     boolean existsByEmail(String email);
+
+    @org.springframework.data.jpa.repository.Modifying(clearAutomatically = true, flushAutomatically = true)
+    @org.springframework.data.jpa.repository.Query(value = "DELETE FROM users WHERE id = :userId", nativeQuery = true)
+    void deleteUserNative(@org.springframework.data.repository.query.Param("userId") Long userId);
 }
 

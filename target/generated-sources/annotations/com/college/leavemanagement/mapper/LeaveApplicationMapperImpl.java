@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2026-07-26T15:21:35+0530",
+    date = "2026-07-29T19:33:52+0530",
     comments = "version: 1.6.3, compiler: javac, environment: Java 25.0.1 (Oracle Corporation)"
 )
 @Component
@@ -38,9 +38,15 @@ public class LeaveApplicationMapperImpl implements LeaveApplicationMapper {
         leaveApplicationDto.setStudentType( leaveApplicationStudentStudentType( leaveApplication ) );
         leaveApplicationDto.setHostelBlock( leaveApplicationStudentHostelBlock( leaveApplication ) );
         leaveApplicationDto.setRoomNumber( leaveApplicationStudentRoomNumber( leaveApplication ) );
+        leaveApplicationDto.setFatherContact( leaveApplicationStudentFatherContact( leaveApplication ) );
+        leaveApplicationDto.setMotherContact( leaveApplicationStudentMotherContact( leaveApplication ) );
         leaveApplicationDto.setId( leaveApplication.getId() );
         leaveApplicationDto.setFromDate( leaveApplication.getFromDate() );
         leaveApplicationDto.setToDate( leaveApplication.getToDate() );
+        leaveApplicationDto.setReturnDate( leaveApplication.getReturnDate() );
+        leaveApplicationDto.setFromTime( leaveApplication.getFromTime() );
+        leaveApplicationDto.setToTime( leaveApplication.getToTime() );
+        leaveApplicationDto.setAddressDuringLeave( leaveApplication.getAddressDuringLeave() );
         leaveApplicationDto.setReason( leaveApplication.getReason() );
         leaveApplicationDto.setSubmittedAt( leaveApplication.getSubmittedAt() );
         leaveApplicationDto.setCurrentStage( leaveApplication.getCurrentStage() );
@@ -153,5 +159,21 @@ public class LeaveApplicationMapperImpl implements LeaveApplicationMapper {
             return null;
         }
         return student.getRoomNumber();
+    }
+
+    private String leaveApplicationStudentFatherContact(LeaveApplication leaveApplication) {
+        Student student = leaveApplication.getStudent();
+        if ( student == null ) {
+            return null;
+        }
+        return student.getFatherContact();
+    }
+
+    private String leaveApplicationStudentMotherContact(LeaveApplication leaveApplication) {
+        Student student = leaveApplication.getStudent();
+        if ( student == null ) {
+            return null;
+        }
+        return student.getMotherContact();
     }
 }

@@ -36,9 +36,30 @@ public class MentorService {
         this.auditLogService = auditLogService;
     }
 
+    @Transactional
     public List<StudentProfileDto> getAssignedStudents(Long mentorId) {
-        return studentRepository.findByMentorIdOrderByRegNoAsc(mentorId)
-                .stream()
+        Mentor mentor = mentorRepository.findById(mentorId).orElse(null);
+        if (mentor == null) {
+            return List.of();
+        }
+
+        List<Student> students = new java.util.ArrayList<>(studentRepository.findByMentorIdOrderByRegNoAsc(mentorId));
+
+        if (mentor.getDeptSection() != null && mentor.getAssignedYear() != null) {
+            List<Student> classStudents = studentRepository.findByDeptSectionAndYearOrderByRegNoAsc(
+                    mentor.getDeptSection(), mentor.getAssignedYear());
+            for (Student s : classStudents) {
+                if (s.getMentor() == null || !s.getMentor().getId().equals(mentor.getId())) {
+                    s.setMentor(mentor);
+                    studentRepository.save(s);
+                }
+                if (students.stream().noneMatch(existing -> existing.getId().equals(s.getId()))) {
+                    students.add(s);
+                }
+            }
+        }
+
+        return students.stream()
                 .map(s -> studentService.getStudentProfile(s.getId()))
                 .collect(Collectors.toList());
     }

@@ -11,6 +11,9 @@ public class MentorDto {
     private String username;
     private String email;
     private int assignedStudentCount;
+    private int hostellerCount;
+    private int dayScholarCount;
+    private int blackTagCount;
 
     public MentorDto() {}
 
@@ -34,4 +37,13 @@ public class MentorDto {
 
     public int getAssignedStudentCount() { return assignedStudentCount; }
     public void setAssignedStudentCount(int assignedStudentCount) { this.assignedStudentCount = assignedStudentCount; }
+
+    public int getHostellerCount() { return hostellerCount; }
+    public void setHostellerCount(int hostellerCount) { this.hostellerCount = hostellerCount; }
+
+    public int getDayScholarCount() { return dayScholarCount; }
+    public void setDayScholarCount(int dayScholarCount) { this.dayScholarCount = dayScholarCount; }
+
+    public int getBlackTagCount() { return blackTagCount; }
+    public void setBlackTagCount(int blackTagCount) { this.blackTagCount = blackTagCount; }
 }

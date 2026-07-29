@@ -7,17 +7,19 @@ public class JwtResponse {
     private String type = "Bearer";
     private Long id;
     private String username;
+    private String name;
     private String email;
     private Role role;
     private Long linkedProfileId;
 
     public JwtResponse() {}
 
-    public JwtResponse(String token, String type, Long id, String username, String email, Role role, Long linkedProfileId) {
+    public JwtResponse(String token, String type, Long id, String username, String name, String email, Role role, Long linkedProfileId) {
         this.token = token;
         if (type != null) this.type = type;
         this.id = id;
         this.username = username;
+        this.name = name;
         this.email = email;
         this.role = role;
         this.linkedProfileId = linkedProfileId;
@@ -39,6 +41,9 @@ public class JwtResponse {
     public String getUsername() { return username; }
     public void setUsername(String username) { this.username = username; }
 
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }
 
@@ -53,6 +58,7 @@ public class JwtResponse {
         private String type = "Bearer";
         private Long id;
         private String username;
+        private String name;
         private String email;
         private Role role;
         private Long linkedProfileId;
@@ -63,12 +69,13 @@ public class JwtResponse {
         public JwtResponseBuilder type(String type) { this.type = type; return this; }
         public JwtResponseBuilder id(Long id) { this.id = id; return this; }
         public JwtResponseBuilder username(String username) { this.username = username; return this; }
+        public JwtResponseBuilder name(String name) { this.name = name; return this; }
         public JwtResponseBuilder email(String email) { this.email = email; return this; }
         public JwtResponseBuilder role(Role role) { this.role = role; return this; }
         public JwtResponseBuilder linkedProfileId(Long linkedProfileId) { this.linkedProfileId = linkedProfileId; return this; }
 
         public JwtResponse build() {
-            return new JwtResponse(token, type, id, username, email, role, linkedProfileId);
+            return new JwtResponse(token, type, id, username, name, email, role, linkedProfileId);
         }
     }
 }

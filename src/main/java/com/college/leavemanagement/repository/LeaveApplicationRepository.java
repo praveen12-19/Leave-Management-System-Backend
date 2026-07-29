@@ -27,6 +27,20 @@ public interface LeaveApplicationRepository extends JpaRepository<LeaveApplicati
 
     List<LeaveApplication> findByStudentMentorIdAndMentorStatusNotOrderByMentorActedAtDesc(Long mentorId, ApprovalStatus status);
 
+    @Query("SELECT l FROM LeaveApplication l WHERE l.currentStage = 'MENTOR_REVIEW' " +
+           "AND (l.student.mentor.id = :mentorId OR (l.student.deptSection = :deptSection AND l.student.year = :year)) " +
+           "ORDER BY l.submittedAt ASC")
+    List<LeaveApplication> findPendingForMentor(@Param("mentorId") Long mentorId,
+                                                @Param("deptSection") DeptSection deptSection,
+                                                @Param("year") Year year);
+
+    @Query("SELECT l FROM LeaveApplication l WHERE l.mentorStatus != 'PENDING' " +
+           "AND (l.student.mentor.id = :mentorId OR (l.student.deptSection = :deptSection AND l.student.year = :year)) " +
+           "ORDER BY l.mentorActedAt DESC")
+    List<LeaveApplication> findHistoryForMentor(@Param("mentorId") Long mentorId,
+                                                @Param("deptSection") DeptSection deptSection,
+                                                @Param("year") Year year);
+
     // HOD Queries
     @Query("SELECT l FROM LeaveApplication l WHERE l.mentorStatus = 'APPROVED' " +
            "AND l.currentStage = 'HOD_REVIEW' " +
